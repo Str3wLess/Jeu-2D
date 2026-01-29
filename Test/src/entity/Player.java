@@ -30,6 +30,8 @@ public class Player extends Entity{
     {
         x = 100;
         y = 100;
+        exactX=x;
+        exactY=y;
         speed = 4;
         direction = "idle";
         lastHorizontalDirection = "right"; // Par défaut regarde à droite
@@ -56,36 +58,68 @@ public class Player extends Entity{
         }
     }
 
+
     public void update()
     {
         if (keyH.upPressed == true || keyH.downPressed == true ||
                 keyH.leftPressed == true || keyH.rightPressed == true)
         {
-            // Permet de changer la position du joueur
-            // En java, la bordure haute gauche est X:0 Y:0
-            // X augmente vers la droite et Y vers le bas
-            if(keyH.upPressed == true)
+            // GESTION DES DÉPLACEMENTS DIAGONAUX
+            if(keyH.upPressed == true && keyH.rightPressed == true)
             {
                 direction = "up";
-                y -= speed;
+                lastHorizontalDirection = "right";
+                exactX += speed * 0.707;  // ← Utilise exactX
+                exactY -= speed * 0.707;  // ← Utilise exactY
+            }
+            else if(keyH.upPressed == true && keyH.leftPressed == true)
+            {
+                direction = "up";
+                lastHorizontalDirection = "left";
+                exactX -= speed * 0.707;
+                exactY -= speed * 0.707;
+            }
+            else if(keyH.downPressed == true && keyH.rightPressed == true)
+            {
+                direction = "down";
+                lastHorizontalDirection = "right";
+                exactX += speed * 0.707;
+                exactY += speed * 0.707;
+            }
+            else if(keyH.downPressed == true && keyH.leftPressed == true)
+            {
+                direction = "down";
+                lastHorizontalDirection = "left";
+                exactX -= speed * 0.707;
+                exactY += speed * 0.707;
+            }
+            // MOUVEMENTS SIMPLES
+            else if(keyH.upPressed == true)
+            {
+                direction = "up";
+                exactY -= speed;  // ← Utilise exactY
             }
             else if (keyH.downPressed == true)
             {
                 direction = "down";
-                y += speed;
+                exactY += speed;
             }
             else if (keyH.leftPressed == true)
             {
                 direction = "left";
-                lastHorizontalDirection = "left"; // ← MÉMORISER
-                x -= speed;
+                lastHorizontalDirection = "left";
+                exactX -= speed;  // ← Utilise exactX
             }
             else if (keyH.rightPressed == true)
             {
                 direction = "right";
-                lastHorizontalDirection = "right"; // ← MÉMORISER
-                x += speed;
+                lastHorizontalDirection = "right";
+                exactX += speed;
             }
+            
+            // ← AJOUT : Convertir les positions précises en entiers pour l'affichage
+            x = (int)exactX;
+            y = (int)exactY;
 
             spriteCounter++;
             if(spriteCounter > 7)
@@ -111,6 +145,7 @@ public class Player extends Entity{
             spriteNum = 1;
         }
     }
+    
     
     public void draw(Graphics2D g2)
     {
