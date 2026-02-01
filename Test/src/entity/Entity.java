@@ -1,9 +1,10 @@
 package entity;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 public class Entity {
-	public int x, y;
+	public int worldX, worldY;
 	public double exactX, exactY;
 	public int speed;
 	
@@ -12,5 +13,8 @@ public class Entity {
 	
 	public int spriteCounter = 0;
 	public int spriteNum = 1;
+	//permet de créer un rectangle abstrait qui va pouvoir stocker des données
+	public Rectangle solidArea;
+	public boolean collisionOn = false;
 
 }
