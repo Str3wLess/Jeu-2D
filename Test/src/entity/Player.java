@@ -19,7 +19,7 @@ public class Player extends Entity{
     public final int screenX;
     public final int screenY;
     
-    private String lastHorizontalDirection = "right";
+    private boolean spriteIncreasing = true; // Pour savoir si on monte ou descend dans l'animation
 
     public Player (KeyHandler keyH, GamePanel gp)
     {
@@ -46,26 +46,44 @@ public class Player extends Entity{
         
         exactX = worldX;
         exactY = worldY;
-        speed = 4;
-        direction = "idle";
-        lastHorizontalDirection = "right";
+        speed = 3;
+        direction = "up";
     }
 
     public void getPlayerImage()
     {
         try {
-            up1 = ImageIO.read(getClass().getResourceAsStream("/player/Player_Idle_1.png"));
-            up2 = ImageIO.read(getClass().getResourceAsStream("/player/Player_Idle_2.png"));
-            down1 = ImageIO.read(getClass().getResourceAsStream("/player/Player_Idle_1.png"));
-            down2 = ImageIO.read(getClass().getResourceAsStream("/player/Player_Idle_1.png"));
-            left1 = ImageIO.read(getClass().getResourceAsStream("/player/Player_Left_1.png"));
-            left2 = ImageIO.read(getClass().getResourceAsStream("/player/Player_Left_2.png"));
-            left3 = ImageIO.read(getClass().getResourceAsStream("/player/Player_Left_3.png"));
-            right1 = ImageIO.read(getClass().getResourceAsStream("/player/Player_Right_1.png"));
-            right2 = ImageIO.read(getClass().getResourceAsStream("/player/Player_Right_2.png"));
-            right3 = ImageIO.read(getClass().getResourceAsStream("/player/Player_Right_3.png"));
-            idle1 = ImageIO.read(getClass().getResourceAsStream("/player/Player_Idle_1.png"));
-            idle2 = ImageIO.read(getClass().getResourceAsStream("/player/Player_Idle_2.png"));
+            up1 = ImageIO.read(getClass().getResourceAsStream("/player/player_up_1.png"));
+            up2 = ImageIO.read(getClass().getResourceAsStream("/player/player_up_2.png"));
+            up3 = ImageIO.read(getClass().getResourceAsStream("/player/player_up_3.png"));
+            
+            down1 = ImageIO.read(getClass().getResourceAsStream("/player/player_down_1.png"));
+            down2 = ImageIO.read(getClass().getResourceAsStream("/player/player_down_2.png"));
+            down3 = ImageIO.read(getClass().getResourceAsStream("/player/player_down_3.png"));  
+            
+            left1 = ImageIO.read(getClass().getResourceAsStream("/player/player_left_1.png"));
+            left2 = ImageIO.read(getClass().getResourceAsStream("/player/player_left_2.png"));
+            left3 = ImageIO.read(getClass().getResourceAsStream("/player/player_left_3.png"));
+            
+            right1 = ImageIO.read(getClass().getResourceAsStream("/player/player_right_1.png"));
+            right2 = ImageIO.read(getClass().getResourceAsStream("/player/player_right_2.png"));
+            right3 = ImageIO.read(getClass().getResourceAsStream("/player/player_right_3.png"));
+           
+            upLeft1 = ImageIO.read(getClass().getResourceAsStream("/player/player_upLeft_1.png"));
+            upLeft2 = ImageIO.read(getClass().getResourceAsStream("/player/player_upLeft_2.png"));
+            upLeft3 = ImageIO.read(getClass().getResourceAsStream("/player/player_upLeft_3.png"));
+            
+            upRight1 = ImageIO.read(getClass().getResourceAsStream("/player/player_upRight_1.png"));
+            upRight2 = ImageIO.read(getClass().getResourceAsStream("/player/player_upRight_2.png"));
+            upRight3 = ImageIO.read(getClass().getResourceAsStream("/player/player_upRight_3.png"));
+            
+            downLeft1 = ImageIO.read(getClass().getResourceAsStream("/player/player_downLeft_1.png"));
+            downLeft2 = ImageIO.read(getClass().getResourceAsStream("/player/player_downLeft_2.png"));
+            downLeft3 = ImageIO.read(getClass().getResourceAsStream("/player/player_downLeft_3.png"));
+            
+            downRight1 = ImageIO.read(getClass().getResourceAsStream("/player/player_downRight_1.png"));
+            downRight2 = ImageIO.read(getClass().getResourceAsStream("/player/player_downRight_2.png"));
+            downRight3 = ImageIO.read(getClass().getResourceAsStream("/player/player_downRight_3.png"));
 
         }catch(IOException e) {
             e.printStackTrace();
@@ -74,7 +92,6 @@ public class Player extends Entity{
 
     public void update()
     {
-        // Le if qui vérifie si une touche est pressée (était manquant)
         if (keyH.upPressed == true || keyH.downPressed == true ||
                 keyH.leftPressed == true || keyH.rightPressed == true)
         {
@@ -82,22 +99,18 @@ public class Player extends Entity{
             if(keyH.upPressed == true && keyH.rightPressed == true)
             {
                 direction = "upRight";
-                lastHorizontalDirection = "right";
             }
             else if(keyH.upPressed == true && keyH.leftPressed == true)
             {
                 direction = "upLeft";
-                lastHorizontalDirection = "left";
             }
             else if(keyH.downPressed == true && keyH.rightPressed == true)
             {
                 direction = "downRight";
-                lastHorizontalDirection = "right";
             }
             else if(keyH.downPressed == true && keyH.leftPressed == true)
             {
                 direction = "downLeft";
-                lastHorizontalDirection = "left";
             }
             // MOUVEMENTS CARDINAUX
             else if(keyH.upPressed == true)
@@ -111,12 +124,10 @@ public class Player extends Entity{
             else if (keyH.leftPressed == true)
             {
                 direction = "left";
-                lastHorizontalDirection = "left";
             }
             else if (keyH.rightPressed == true)
             {
                 direction = "right";
-                lastHorizontalDirection = "right";
             }
 
             worldX = (int)exactX;
@@ -139,27 +150,33 @@ public class Player extends Entity{
             }
 
             spriteCounter++;
-            if(spriteCounter > 7)
+            if(spriteCounter > 15)
             {
-                if(spriteNum == 1)
+                // Animation ping-pong : 1 → 2 → 3 → 2 → 1 → 2 → 3...
+                if(spriteIncreasing)
                 {
-                    spriteNum = 2;
+                    spriteNum++;
+                    if(spriteNum == 3)
+                    {
+                        spriteIncreasing = false; // On atteint 3, on commence à descendre
+                    }
                 }
-                else if(spriteNum == 2)
+                else
                 {
-                    spriteNum = 3;
-                }
-                else if (spriteNum == 3)
-                {
-                    spriteNum = 1;
+                    spriteNum--;
+                    if(spriteNum == 1)
+                    {
+                        spriteIncreasing = true; // On atteint 1, on recommence à monter
+                    }
                 }
                 spriteCounter = 0;
             }
         }
         else
         {
-            direction = "idle";
+            direction = "up";
             spriteNum = 1;
+            spriteIncreasing = true; // Reset de la direction d'animation
         }
     }
     
@@ -169,33 +186,15 @@ public class Player extends Entity{
 
         switch(direction) {
         case "up":
-            if (lastHorizontalDirection.equals("left"))
-            {
-                if (spriteNum == 1) image = left1;
-                else if (spriteNum == 2) image = left2;
-                else if (spriteNum == 3) image = left3;
-            }
-            else
-            {
-                if (spriteNum == 1) image = right1;
-                else if (spriteNum == 2) image = right2;
-                else if (spriteNum == 3) image = right3;
-            }
+            if (spriteNum == 1) image = up1;
+            else if (spriteNum == 2) image = up2;
+            else if (spriteNum == 3) image = up3;
             break;
 
         case "down":
-            if (lastHorizontalDirection.equals("left"))
-            {
-                if (spriteNum == 1) image = left1;
-                else if (spriteNum == 2) image = left2;
-                else if (spriteNum == 3) image = left3;
-            }
-            else
-            {
-                if (spriteNum == 1) image = right1;
-                else if (spriteNum == 2) image = right2;
-                else if (spriteNum == 3) image = right3;
-            }
+            if (spriteNum == 1) image = down1;
+            else if (spriteNum == 2) image = down2;
+            else if (spriteNum == 3) image = down3;
             break;
 
         case "left":
@@ -210,31 +209,28 @@ public class Player extends Entity{
             else if (spriteNum == 3) image = right3;
             break;
 
-        // Les directions diagonales pour l'animation
         case "upRight":
-        case "downRight":
-            if (spriteNum == 1) image = right1;
-            else if (spriteNum == 2) image = right2;
-            else if (spriteNum == 3) image = right3;
+            if (spriteNum == 1) image = upRight1;
+            else if (spriteNum == 2) image = upRight2;
+            else if (spriteNum == 3) image = upRight3;
             break;
 
         case "upLeft":
-        case "downLeft":
-            if (spriteNum == 1) image = left1;
-            else if (spriteNum == 2) image = left2;
-            else if (spriteNum == 3) image = left3;
+            if (spriteNum == 1) image = upLeft1;
+            else if (spriteNum == 2) image = upLeft2;
+            else if (spriteNum == 3) image = upLeft3;
             break;
 
-        case "idle":
-        default:
-            if (lastHorizontalDirection.equals("left"))
-            {
-                image = idle1;
-            }
-            else
-            {
-                image = idle2;
-            }
+        case "downRight":
+            if (spriteNum == 1) image = downRight1;
+            else if (spriteNum == 2) image = downRight2;
+            else if (spriteNum == 3) image = downRight3;
+            break;
+
+        case "downLeft":
+            if (spriteNum == 1) image = downLeft1;
+            else if (spriteNum == 2) image = downLeft2;
+            else if (spriteNum == 3) image = downLeft3;
             break;
         }
         
